@@ -313,7 +313,7 @@ export function registerUtilityTools(server, getBrowserInstances) {
 
       try {
         const info = {
-          url: await page.url(),
+          url: page.url(),
           title: await page.title()
         };
 

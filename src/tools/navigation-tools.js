@@ -28,7 +28,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
 
       try {
         const response = await page.goto(url, { waitUntil, timeout });
-        const finalUrl = await page.url();
+        const finalUrl = page.url();
         const title = await page.title();
 
         return {
@@ -86,7 +86,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
 
       try {
         await page.goBack({ waitUntil, timeout });
-        const url = await page.url();
+        const url = page.url();
         const title = await page.title();
 
         return {
@@ -135,7 +135,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
 
       try {
         await page.goForward({ waitUntil, timeout });
-        const url = await page.url();
+        const url = page.url();
         const title = await page.title();
 
         return {
@@ -184,7 +184,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
 
       try {
         await page.reload({ waitUntil, timeout });
-        const url = await page.url();
+        const url = page.url();
         const title = await page.title();
 
         return {
@@ -293,7 +293,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
         const tabsInfo = await Promise.all(
           pages.map(async (page, index) => {
             try {
-              const url = await page.url();
+              const url = page.url();
               const title = await page.title();
               const isCurrent = page === currentPage;
               

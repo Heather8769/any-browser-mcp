@@ -100,7 +100,7 @@ export function registerBrowserTools(server, getBrowserInstances) {
 
       try {
         let content;
-        const url = await page.url();
+        const url = page.url();
         const title = await page.title();
 
         if (selector) {
@@ -168,7 +168,7 @@ export function registerBrowserTools(server, getBrowserInstances) {
 
         if (url) {
           await page.waitForURL(url, { timeout });
-          result = { condition: 'url', value: url, currentUrl: await page.url() };
+          result = { condition: 'url', value: url, currentUrl: page.url() };
         } else if (selector) {
           if (text) {
             await page.waitForSelector(`${selector}:has-text("${text}")`, { state, timeout });

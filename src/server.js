@@ -40,19 +40,25 @@ export async function startMCPServer(options = {}) {
     }
 
     try {
-      globalBrowser = await attachToRunningBrowser({ 
-        endpoint, 
-        brand: browserPref, 
-        customPort, 
-        verbose 
+      globalBrowser = await attachToRunningBrowser({
+        endpoint,
+        brand: browserPref,
+        customPort,
+        verbose
       });
     } catch (attachError) {
       if (!allowLaunch) {
-        throw attachError;
+        if (verbose) {
+          console.error('❌ Browser attachment failed and launching is disabled');
+          console.error('💡 To enable browser launching, use --launch flag');
+        }
+        throw new Error(`Cannot connect to existing browser and launching is disabled. ${attachError.message}`);
       }
-      
+
       if (verbose) {
-        console.error('⚠️  Attachment failed, launching new browser...');
+        console.error('⚠️  No existing browser found with debugging enabled');
+        console.error('🚀 Falling back to launching new browser instance...');
+        console.error('💡 To avoid this, start your browser with debugging enabled first');
       }
       globalBrowser = await launchBrowser(browserPref, verbose);
     }

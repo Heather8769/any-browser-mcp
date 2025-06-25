@@ -28,9 +28,9 @@ yargs(hideBin(process.argv))
        desc: 'Browser preference (default: auto-detect)'
      })
      .option('launch', {
-       boolean: true, 
-       default: true,  // Default to true for npx usage
-       desc: 'Launch browser if none found (default: true)'
+       boolean: true,
+       default: false,  // Default to false - prioritize existing browsers
+       desc: 'Launch browser if none found (default: false - connects to existing only)'
      })
      .option('port', {
        alias: 'p',

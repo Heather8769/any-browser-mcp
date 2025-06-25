@@ -52,7 +52,13 @@ export function registerNavigationTools(server, getBrowserInstances) {
               success: false,
               error: error.message,
               requestedUrl: url,
-              currentUrl: await page.url().catch(() => 'unknown')
+              currentUrl: (() => {
+                try {
+                  return page.url();
+                } catch {
+                  return 'unknown';
+                }
+              })()
             }, null, 2)
           }],
           isError: true

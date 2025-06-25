@@ -63,9 +63,33 @@ export async function startMCPServer(options = {}) {
       globalBrowser = await launchBrowser(browserPref, verbose);
     }
 
-    // Create default context and page
-    globalContext = await globalBrowser.newContext();
-    globalPage = await globalContext.newPage();
+    // Use existing context and pages when connecting to running browser
+    const existingContexts = globalBrowser.contexts();
+    if (existingContexts.length > 0) {
+      // Use the first existing context
+      globalContext = existingContexts[0];
+      const existingPages = globalContext.pages();
+      if (existingPages.length > 0) {
+        // Use the first existing page
+        globalPage = existingPages[0];
+        if (verbose) {
+          console.error(`📄 Using existing page: ${await globalPage.url()}`);
+        }
+      } else {
+        // Create a new page in the existing context
+        globalPage = await globalContext.newPage();
+        if (verbose) {
+          console.error('📄 Created new page in existing context');
+        }
+      }
+    } else {
+      // Create new context and page (fallback for launched browsers)
+      globalContext = await globalBrowser.newContext();
+      globalPage = await globalContext.newPage();
+      if (verbose) {
+        console.error('📄 Created new context and page');
+      }
+    }
 
     if (verbose) {
       console.error('✅ Browser connection established');

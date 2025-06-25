@@ -1,17 +1,20 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { attachToRunningBrowser, launchBrowser } from './utils/attach.js';
+import { DirectCDPClient, getAvailablePages, createNewTab } from './utils/cdp-direct.js';
 import { registerBrowserTools } from './tools/browser-tools.js';
 import { registerNavigationTools } from './tools/navigation-tools.js';
 import { registerInteractionTools } from './tools/interaction-tools.js';
 import { registerUtilityTools } from './tools/utility-tools.js';
 
 /**
- * Global browser instance - shared across all MCP operations
+ * Global browser instances - shared across all MCP operations
  */
 let globalBrowser = null;
 let globalContext = null;
 let globalPage = null;
+let directCDPClient = null;
+let useDirectCDP = false;
 
 /**
  * Initialize and start the MCP server

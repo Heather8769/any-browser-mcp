@@ -199,8 +199,52 @@ export async function attachToRunningBrowser({ endpoint, brand = 'detect', custo
       continue;
     }
 
-    // Step 3: Try to connect via WebSocket
-    const wsURL = `ws://127.0.0.1:${port}/devtools/browser`;
+    // Step 3: Get the actual WebSocket URL from the browser
+    let wsURL;
+    try {
+      const http = await import('http');
+
+      wsURL = await new Promise((resolve, reject) => {
+        const req = http.default.get(`http://localhost:${port}/json/version`, { timeout: 5000 }, (res) => {
+          if (res.statusCode === 200) {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+              try {
+                const versionInfo = JSON.parse(data);
+                resolve(versionInfo.webSocketDebuggerUrl);
+              } catch (parseError) {
+                reject(new Error(`Failed to parse version info: ${parseError.message}`));
+              }
+            });
+          } else {
+            reject(new Error(`HTTP ${res.statusCode}`));
+          }
+        });
+
+        req.on('error', reject);
+        req.on('timeout', () => {
+          req.destroy();
+          reject(new Error('Request timeout'));
+        });
+      });
+
+      if (verbose) {
+        console.error(`🔗 Found WebSocket URL: ${wsURL}`);
+      }
+    } catch (fetchError) {
+      if (verbose) {
+        console.error(`❌ Failed to get WebSocket URL from ${browserBrand}: ${fetchError.message}`);
+      }
+      connectionAttempts.push({
+        browser: browserBrand,
+        port,
+        hasProcess,
+        isAccessible,
+        error: `Failed to get WebSocket URL: ${fetchError.message}`
+      });
+      continue;
+    }
 
     if (verbose) {
       console.error(`🔍 Attempting WebSocket connection to ${browserBrand} on port ${port}: ${wsURL}`);

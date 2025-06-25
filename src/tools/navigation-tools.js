@@ -242,7 +242,7 @@ export function registerNavigationTools(server, getBrowserInstances) {
           setCurrentPage(newPage);
         }
 
-        const pageUrl = url ? await newPage.url() : 'about:blank';
+        const pageUrl = url ? newPage.url() : 'about:blank';
         const title = url ? await newPage.title() : 'New Tab';
 
         return {

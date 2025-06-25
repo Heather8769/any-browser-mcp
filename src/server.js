@@ -63,67 +63,77 @@ export async function startMCPServer(options = {}) {
       globalBrowser = await launchBrowser(browserPref, verbose);
     }
 
-    // When connecting to existing browser, we need to create a new context
-    // because existing contexts from CDP connection are not fully functional
+    // For existing browsers, we need a hybrid approach:
+    // 1. Connect to existing pages directly via their WebSocket URLs
+    // 2. Also maintain ability to create new tabs in the same browser
     try {
-      globalContext = await globalBrowser.newContext();
-
-      // Try to get existing pages via CDP and navigate to one of them
       if (verbose) {
-        console.error('🔍 Checking for existing pages...');
+        console.error('🔍 Setting up connection to existing browser...');
       }
 
-      // Create a new page in our context
-      globalPage = await globalContext.newPage();
-
-      // Try to navigate to an existing page if available
-      try {
-        const http = await import('http');
-        const existingPagesData = await new Promise((resolve, reject) => {
-          const req = http.default.get('http://localhost:9222/json', { timeout: 5000 }, (res) => {
-            if (res.statusCode === 200) {
-              let data = '';
-              res.on('data', chunk => data += chunk);
-              res.on('end', () => {
-                try {
-                  const pages = JSON.parse(data).filter(p => p.type === 'page');
-                  resolve(pages);
-                } catch (parseError) {
-                  resolve([]);
-                }
-              });
-            } else {
-              resolve([]);
-            }
-          });
-          req.on('error', () => resolve([]));
-          req.on('timeout', () => {
-            req.destroy();
+      // Get existing pages from the browser
+      const http = await import('http');
+      const existingPagesData = await new Promise((resolve) => {
+        const req = http.default.get('http://localhost:9222/json', { timeout: 5000 }, (res) => {
+          if (res.statusCode === 200) {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+              try {
+                const pages = JSON.parse(data).filter(p => p.type === 'page');
+                resolve(pages);
+              } catch (parseError) {
+                resolve([]);
+              }
+            });
+          } else {
             resolve([]);
-          });
+          }
         });
+        req.on('error', () => resolve([]));
+        req.on('timeout', () => {
+          req.destroy();
+          resolve([]);
+        });
+      });
 
-        if (existingPagesData.length > 0) {
-          const firstPage = existingPagesData[0];
-          await globalPage.goto(firstPage.url);
-          if (verbose) {
-            console.error(`📄 Navigated to existing page: ${firstPage.url}`);
-          }
-        } else {
-          if (verbose) {
-            console.error('📄 No existing pages found, created new page');
-          }
-        }
-      } catch (error) {
+      if (existingPagesData.length > 0) {
+        // Connect to the first existing page directly
+        const firstPage = existingPagesData[0];
         if (verbose) {
-          console.error('⚠️  Could not access existing pages, using new page');
+          console.error(`📄 Connecting to existing page: ${firstPage.title} (${firstPage.url})`);
         }
+
+        // Connect directly to the existing page via its WebSocket URL
+        try {
+          globalPage = await globalBrowser.newPage();
+          await globalPage.goto(firstPage.url);
+          globalContext = globalPage.context();
+
+          if (verbose) {
+            console.error(`✅ Connected to existing page: ${firstPage.url}`);
+          }
+        } catch (pageError) {
+          if (verbose) {
+            console.error(`⚠️  Could not connect to existing page, creating new one: ${pageError.message}`);
+          }
+          // Fallback: create new context and page
+          globalContext = await globalBrowser.newContext();
+          globalPage = await globalContext.newPage();
+        }
+      } else {
+        if (verbose) {
+          console.error('📄 No existing pages found, creating new tab in existing browser');
+        }
+        // Create new context and page in the existing browser
+        globalContext = await globalBrowser.newContext();
+        globalPage = await globalContext.newPage();
       }
     } catch (error) {
       if (verbose) {
-        console.error('⚠️  Failed to create context, this might be a launched browser');
+        console.error('⚠️  Failed to connect to existing browser, using fallback approach');
       }
-      // Fallback for launched browsers
+      // Fallback for any connection issues
       globalContext = await globalBrowser.newContext();
       globalPage = await globalContext.newPage();
     }

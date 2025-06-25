@@ -1,0 +1,43 @@
+[build]
+  functions = "netlify/functions"
+  publish = "public"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[functions]]
+  path = "/.netlify/functions/any-browser-mcp"
+  methods = ["GET", "POST", "DELETE", "OPTIONS"]
+
+[dev]
+  functions = "netlify/functions"
+  port = 8888
+
+# Environment variables for development
+[context.dev.environment]
+  NODE_ENV = "development"
+  ALLOW_BROWSER_LAUNCH = "true"
+
+# Environment variables for production
+[context.production.environment]
+  NODE_ENV = "production"
+
+# Headers for CORS support
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, mcp-session-id"
+    Access-Control-Expose-Headers = "mcp-session-id"
+
+# Redirect rules for function routing
+[[redirects]]
+  from = "/mcp"
+  to = "/.netlify/functions/any-browser-mcp"
+  status = 200
+
+[[redirects]]
+  from = "/mcp/*"
+  to = "/.netlify/functions/any-browser-mcp"
+  status = 200

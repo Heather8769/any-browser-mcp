@@ -1,0 +1,34 @@
+# Development files
+test/
+examples/
+.vscode/
+.idea/
+
+# Documentation (keep README.md)
+QUICKSTART.md
+*.log
+
+# Build artifacts
+*.tgz
+coverage/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Node modules (already excluded by default)
+node_modules/
+
+# Netlify (keep for deployment reference)
+# netlify/
+# netlify.toml
+# public/

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "anybrowser": {
+      "command": "npx",
+      "args": [
+        "@anybrowser/mcp@latest"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

@@ -1,0 +1,164 @@
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { attachToRunningBrowser, launchBrowser } from './utils/attach.js';
+import { registerBrowserTools } from './tools/browser-tools.js';
+import { registerNavigationTools } from './tools/navigation-tools.js';
+import { registerInteractionTools } from './tools/interaction-tools.js';
+import { registerUtilityTools } from './tools/utility-tools.js';
+
+/**
+ * Global browser instance - shared across all MCP operations
+ */
+let globalBrowser = null;
+let globalContext = null;
+let globalPage = null;
+
+/**
+ * Initialize and start the MCP server
+ * @param {Object} options - Server configuration options
+ */
+export async function startMCPServer(options = {}) {
+  const { 
+    endpoint, 
+    browserPref = 'detect', 
+    allowLaunch = false, 
+    customPort,
+    verbose = false 
+  } = options;
+
+  // Create MCP server instance
+  const server = new McpServer({
+    name: 'any-browser-mcp',
+    version: '1.0.0',
+    description: 'MCP server for browser automation via CDP - connects to existing browser sessions'
+  });
+
+  // Initialize browser connection
+  try {
+    if (verbose) {
+      console.error('🌐 Initializing browser connection...');
+    }
+
+    try {
+      globalBrowser = await attachToRunningBrowser({ 
+        endpoint, 
+        brand: browserPref, 
+        customPort, 
+        verbose 
+      });
+    } catch (attachError) {
+      if (!allowLaunch) {
+        throw attachError;
+      }
+      
+      if (verbose) {
+        console.error('⚠️  Attachment failed, launching new browser...');
+      }
+      globalBrowser = await launchBrowser(browserPref, verbose);
+    }
+
+    // Create default context and page
+    globalContext = await globalBrowser.newContext();
+    globalPage = await globalContext.newPage();
+
+    if (verbose) {
+      console.error('✅ Browser connection established');
+    }
+
+  } catch (error) {
+    console.error('❌ Failed to initialize browser:', error.message);
+    throw error;
+  }
+
+  // Register all tool categories
+  registerBrowserTools(server, () => ({ browser: globalBrowser, context: globalContext, page: globalPage }));
+  registerNavigationTools(server, () => ({ browser: globalBrowser, context: globalContext, page: globalPage }));
+  registerInteractionTools(server, () => ({ browser: globalBrowser, context: globalContext, page: globalPage }));
+  registerUtilityTools(server, () => ({ browser: globalBrowser, context: globalContext, page: globalPage }));
+
+  // Add a resource for browser status
+  server.registerResource(
+    'browser-status',
+    'browser://status',
+    {
+      title: 'Browser Status',
+      description: 'Current browser connection and page information',
+      mimeType: 'application/json'
+    },
+    async () => {
+      const contexts = globalBrowser ? globalBrowser.contexts() : [];
+      const pages = globalContext ? globalContext.pages() : [];
+      
+      return {
+        contents: [{
+          uri: 'browser://status',
+          text: JSON.stringify({
+            connected: !!globalBrowser,
+            browserType: globalBrowser?._initializer?.name || 'unknown',
+            contextsCount: contexts.length,
+            pagesCount: pages.length,
+            currentUrl: globalPage ? await globalPage.url() : null,
+            currentTitle: globalPage ? await globalPage.title() : null
+          }, null, 2)
+        }]
+      };
+    }
+  );
+
+  // Handle cleanup on exit
+  const cleanup = async () => {
+    if (verbose) {
+      console.error('🧹 Cleaning up browser connections...');
+    }
+    
+    try {
+      if (globalContext) {
+        await globalContext.close();
+      }
+      if (globalBrowser) {
+        await globalBrowser.close();
+      }
+    } catch (error) {
+      if (verbose) {
+        console.error('⚠️  Cleanup error:', error.message);
+      }
+    }
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+  process.on('exit', cleanup);
+
+  // Start the MCP server with stdio transport
+  const transport = new StdioServerTransport();
+  
+  if (verbose) {
+    console.error('🚀 Starting MCP server on stdio...');
+  }
+
+  await server.connect(transport);
+  
+  if (verbose) {
+    console.error('✅ MCP server is running and ready for connections');
+  }
+}
+
+/**
+ * Get current browser instances (for use by tools)
+ * @returns {Object} Current browser, context, and page instances
+ */
+export function getBrowserInstances() {
+  return {
+    browser: globalBrowser,
+    context: globalContext, 
+    page: globalPage
+  };
+}
+
+/**
+ * Update the global page reference (when switching tabs, etc.)
+ * @param {Page} newPage - New page to set as current
+ */
+export function setCurrentPage(newPage) {
+  globalPage = newPage;
+}

@@ -1,0 +1,52 @@
+{
+  "name": "@anybrowser/mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server that attaches to existing browser sessions via Chrome DevTools Protocol",
+  "keywords": ["mcp", "browser", "automation", "playwright", "cdp", "chrome", "firefox", "edge", "model-context-protocol"],
+  "author": "Shigeo",
+  "license": "MIT",
+  "homepage": "https://github.com/Heather8769/any-browser-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Heather8769/any-browser-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Heather8769/any-browser-mcp/issues"
+  },
+  "bin": {
+    "any-browser-mcp": "./bin/npx-cli.js",
+    "anybrowser-mcp": "./bin/npx-cli.js"
+  },
+  "preferGlobal": true,
+  "main": "./src/server.js",
+  "exports": {
+    ".": "./src/server.js",
+    "./cli": "./bin/cli.js",
+    "./npx": "./bin/npx-cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "playwright-core": "^1.43.0",
+    "yargs": "^17.7.2",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "dev": "node bin/cli.js --launch",
+    "test": "node test/test.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "netlify/",
+    "README.md"
+  ]
+}

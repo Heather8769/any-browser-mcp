@@ -1,0 +1,45 @@
+{
+  "mcpServers": {
+    "any-browser-local": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/any-browser-mcp/bin/cli.js",
+        "--launch"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "any-browser-chrome": {
+      "command": "node", 
+      "args": [
+        "/absolute/path/to/any-browser-mcp/bin/cli.js",
+        "--browser", "chrome",
+        "--endpoint", "ws://127.0.0.1:9222/devtools/browser"
+      ]
+    },
+    "any-browser-edge": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/any-browser-mcp/bin/cli.js", 
+        "--browser", "edge",
+        "--port", "9223"
+      ]
+    },
+    "any-browser-firefox": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/any-browser-mcp/bin/cli.js",
+        "--browser", "firefox", 
+        "--port", "9224"
+      ]
+    },
+    "any-browser-remote": {
+      "endpoint": "https://your-site.netlify.app/.netlify/functions/any-browser-mcp",
+      "transportType": "http",
+      "headers": {
+        "Authorization": "Bearer your-token-if-needed"
+      }
+    }
+  }
+}

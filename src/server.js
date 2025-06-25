@@ -63,32 +63,69 @@ export async function startMCPServer(options = {}) {
       globalBrowser = await launchBrowser(browserPref, verbose);
     }
 
-    // Use existing context and pages when connecting to running browser
-    const existingContexts = globalBrowser.contexts();
-    if (existingContexts.length > 0) {
-      // Use the first existing context
-      globalContext = existingContexts[0];
-      const existingPages = globalContext.pages();
-      if (existingPages.length > 0) {
-        // Use the first existing page
-        globalPage = existingPages[0];
-        if (verbose) {
-          console.error(`📄 Using existing page: ${await globalPage.url()}`);
+    // When connecting to existing browser, we need to create a new context
+    // because existing contexts from CDP connection are not fully functional
+    try {
+      globalContext = await globalBrowser.newContext();
+
+      // Try to get existing pages via CDP and navigate to one of them
+      if (verbose) {
+        console.error('🔍 Checking for existing pages...');
+      }
+
+      // Create a new page in our context
+      globalPage = await globalContext.newPage();
+
+      // Try to navigate to an existing page if available
+      try {
+        const http = await import('http');
+        const existingPagesData = await new Promise((resolve, reject) => {
+          const req = http.default.get('http://localhost:9222/json', { timeout: 5000 }, (res) => {
+            if (res.statusCode === 200) {
+              let data = '';
+              res.on('data', chunk => data += chunk);
+              res.on('end', () => {
+                try {
+                  const pages = JSON.parse(data).filter(p => p.type === 'page');
+                  resolve(pages);
+                } catch (parseError) {
+                  resolve([]);
+                }
+              });
+            } else {
+              resolve([]);
+            }
+          });
+          req.on('error', () => resolve([]));
+          req.on('timeout', () => {
+            req.destroy();
+            resolve([]);
+          });
+        });
+
+        if (existingPagesData.length > 0) {
+          const firstPage = existingPagesData[0];
+          await globalPage.goto(firstPage.url);
+          if (verbose) {
+            console.error(`📄 Navigated to existing page: ${firstPage.url}`);
+          }
+        } else {
+          if (verbose) {
+            console.error('📄 No existing pages found, created new page');
+          }
         }
-      } else {
-        // Create a new page in the existing context
-        globalPage = await globalContext.newPage();
+      } catch (error) {
         if (verbose) {
-          console.error('📄 Created new page in existing context');
+          console.error('⚠️  Could not access existing pages, using new page');
         }
       }
-    } else {
-      // Create new context and page (fallback for launched browsers)
+    } catch (error) {
+      if (verbose) {
+        console.error('⚠️  Failed to create context, this might be a launched browser');
+      }
+      // Fallback for launched browsers
       globalContext = await globalBrowser.newContext();
       globalPage = await globalContext.newPage();
-      if (verbose) {
-        console.error('📄 Created new context and page');
-      }
     }
 
     if (verbose) {

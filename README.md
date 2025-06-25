@@ -1,22 +1,55 @@
-# Any Browser MCP
+# Any Browser MCP 🚀
 
-A production-grade MCP (Model Context Protocol) server that **attaches to an already-running desktop browser** (Chrome, Edge/Chromium, or Firefox) via the Chrome DevTools Protocol (CDP). It exposes a comprehensive Playwright-style API over JSON-RPC/stdio and can also run inside a Netlify Function for remote browser automation.
+**Revolutionary Browser Automation via Model Context Protocol (MCP)**
 
-## 🚀 Features
+## 🎯 **The Breakthrough: No Isolated Contexts**
 
-- **Attach to Running Browsers**: Connect to existing Chrome, Edge, or Firefox sessions
-- **Full Playwright API**: Complete browser automation capabilities
-- **Multiple Transports**: stdio for local use, HTTP for remote deployment
-- **Auto-Detection**: Automatically finds running browsers on standard debug ports
-- **Fallback Launching**: Optionally launch new browser instances if none found
-- **Netlify Functions**: Deploy as serverless function for remote browser control
-- **Session Management**: Stateful sessions for complex automation workflows
+Unlike traditional browser automation tools that create separate, isolated browser instances, **Any Browser MCP directly controls your existing browser** - the one you can see and interact with!
+
+### ❌ **Traditional Automation (Isolated)**
+```
+Your Real Browser          Automation Tool
+┌─────────────────┐       ┌─────────────────┐
+│ 🌐 Your tabs    │  ❌   │ 🤖 Separate     │
+│ • Gmail         │       │ • Clean profile │
+│ • Your data     │       │ • No bookmarks  │
+└─────────────────┘       └─────────────────┘
+```
+
+### ✅ **Any Browser MCP (Direct Control)**
+```
+Your Real Browser (SAME BROWSER!)
+┌─────────────────────────────────┐
+│ 🌐 Your tabs ← 🤖 MCP Controls  │
+│ • Gmail      ← ✅ Available     │
+│ • Your data  ← ✅ Available     │
+└─────────────────────────────────┘
+```
+
+A production-grade MCP (Model Context Protocol) server that **directly controls your existing browser** via the Chrome DevTools Protocol (CDP). No isolated contexts - it controls the actual browser windows you can see and interact with!
+
+## 🌟 **Key Features**
+
+- **🚀 Auto-Launch Chrome** - Automatically starts Chrome with debugging when needed
+- **🔗 Direct Browser Control** - Controls your actual visible browser tabs
+- **📋 Profile Preservation** - Uses your bookmarks, passwords, extensions
+- **🛠️ 20+ Automation Tools** - Complete browser automation toolkit
+- **🎯 No Isolation** - Works with your real browser, not a separate instance
+- **⚡ Chrome DevTools Protocol** - Direct WebSocket communication for maximum performance
+- **🔄 Smart Detection** - Finds existing Chrome or launches new instance
+- **🧹 Graceful Cleanup** - Proper connection management and cleanup
 
 ## 📦 Installation
 
-### Quick Start (Recommended)
+### Quick Start (Recommended) - Direct Control
 ```bash
-# No installation needed! Use with npx:
+# Auto-launch Chrome and start MCP server:
+npx any-browser-mcp-direct --verbose
+```
+
+### Traditional MCP Server (Isolated Contexts)
+```bash
+# Original version with Playwright isolation:
 npx any-browser-mcp@latest
 ```
 

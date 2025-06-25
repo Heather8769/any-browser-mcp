@@ -1,9 +1,19 @@
 {
   "name": "any-browser-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "MCP server that attaches to existing browser sessions via Chrome DevTools Protocol",
-  "keywords": ["mcp", "browser", "automation", "playwright", "cdp", "chrome", "firefox", "edge", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "browser",
+    "automation",
+    "playwright",
+    "cdp",
+    "chrome",
+    "firefox",
+    "edge",
+    "model-context-protocol"
+  ],
   "author": "Shigeo",
   "license": "MIT",
   "homepage": "https://github.com/Heather8769/any-browser-mcp#readme",

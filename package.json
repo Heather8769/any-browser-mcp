@@ -1,5 +1,5 @@
 {
-  "name": "@anybrowser/mcp",
+  "name": "any-browser-mcp",
   "version": "1.0.0",
   "type": "module",
   "description": "MCP server that attaches to existing browser sessions via Chrome DevTools Protocol",

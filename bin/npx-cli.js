@@ -74,8 +74,8 @@ yargs(hideBin(process.argv))
       }
     })
   .help()
-  .example('npx @anybrowser/mcp', 'Auto-detect browser and start MCP server')
-  .example('npx @anybrowser/mcp --browser chrome', 'Connect specifically to Chrome')
-  .example('npx @anybrowser/mcp --endpoint ws://127.0.0.1:9222/devtools/browser', 'Use explicit endpoint')
-  .epilogue('For more information, visit: https://github.com/yourusername/any-browser-mcp')
+  .example('npx any-browser-mcp@latest', 'Auto-detect browser and start MCP server')
+  .example('npx any-browser-mcp@latest --browser chrome', 'Connect specifically to Chrome')
+  .example('npx any-browser-mcp@latest --endpoint ws://127.0.0.1:9222/devtools/browser', 'Use explicit endpoint')
+  .epilogue('For more information, visit: https://github.com/Heather8769/any-browser-mcp')
   .argv;

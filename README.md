@@ -17,12 +17,12 @@ A production-grade MCP (Model Context Protocol) server that **attaches to an alr
 ### Quick Start (Recommended)
 ```bash
 # No installation needed! Use with npx:
-npx @anybrowser/mcp@latest
+npx any-browser-mcp@latest
 ```
 
 ### Global Installation
 ```bash
-npm install -g @anybrowser/mcp
+npm install -g any-browser-mcp
 ```
 
 ### Local Development
@@ -68,17 +68,17 @@ devtools.debugger.remote-port = 9224
 
 **Auto-detect running browser:**
 ```bash
-npx @anybrowser/mcp@latest
+npx any-browser-mcp@latest
 ```
 
 **Connect to specific endpoint:**
 ```bash
-npx @anybrowser/mcp@latest --endpoint ws://127.0.0.1:9222/devtools/browser
+npx any-browser-mcp@latest --endpoint ws://127.0.0.1:9222/devtools/browser
 ```
 
 **Connect to specific browser:**
 ```bash
-npx @anybrowser/mcp@latest --browser chrome
+npx any-browser-mcp@latest --browser chrome
 ```
 
 ### 3. Configure with Claude Desktop
@@ -90,7 +90,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "anybrowser": {
       "command": "npx",
-      "args": ["@anybrowser/mcp@latest"]
+      "args": ["any-browser-mcp@latest"]
     }
   }
 }

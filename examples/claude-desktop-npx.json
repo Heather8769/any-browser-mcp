@@ -3,7 +3,7 @@
     "anybrowser": {
       "command": "npx",
       "args": [
-        "@anybrowser/mcp@latest"
+        "any-browser-mcp@latest"
       ],
       "env": {
         "NODE_ENV": "production"

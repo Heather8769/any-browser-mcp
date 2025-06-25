@@ -26,7 +26,8 @@
   },
   "bin": {
     "any-browser-mcp": "./bin/npx-cli.js",
-    "anybrowser-mcp": "./bin/npx-cli.js"
+    "anybrowser-mcp": "./bin/npx-cli.js",
+    "any-browser-mcp-direct": "./bin/direct-cli.js"
   },
   "preferGlobal": true,
   "main": "./src/server.js",
